@@ -470,3 +470,29 @@ def run_model_view(request):
                 message = e.__str__()
                 traceback.print_exc()
     return render(request, 'polls/run_model.html', locals())
+
+
+# ------------------------------------------------------------------------------
+#   系统设置视图
+#   设定一些统一的设置，比如截止提交时间，只有管理员有权限
+# ------------------------------------------------------------------------------
+@staff_member_required(login_url=reverse_lazy('login'))
+def get_tutor(request):
+    """
+    导入导师名单
+    """
+    if not request.user.is_superuser:
+        raise PermissionDenied
+    globalvar = GlobalVar.get()
+    globalvar_form = forms.GlobalVarForm(initial=globalvar)
+    tutor_form = forms.SelectTutor()
+    if request.method == 'POST':
+        globalvar_form = forms.GlobalVarForm(request.POST)
+        message = '导入失败'
+        if globalvar_form.is_valid():
+            try:
+                GlobalVar.set(globalvar_form.cleaned_data)
+                message = '导入成功'
+            except Exception as e:
+                message = e.__str__()
+    return render(request, 'polls/GlobalVar.html', locals())

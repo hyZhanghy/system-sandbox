@@ -116,7 +116,10 @@ class GlobalVarForm(forms.Form):
         label='问题反馈邮箱', required=True,
         widget=forms.TextInput()
     )
-
+    tutor = forms.CharField(
+        label='导师名单', required=True,
+        widget=forms.Textarea()
+    )
 
 class SendMultiMailForm(forms.Form):
     title = forms.CharField(
@@ -157,6 +160,18 @@ class SelectModelForm(forms.Form):
             choices=MLModel.objects.annotate(
                 human_readable=Concat('name', 'version', output_field=CharField())
             ).values_list('id', 'human_readable'),
+            widget=forms.Select(),
+            required=True
+        )
+
+
+class SelectTutor(forms.Form):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['tutor'] = forms.CharField(
+            label='导师名单',
+            # choices=MLModel.objects.annotate().values_list('name', 'research-direction'),
             widget=forms.Select(),
             required=True
         )
